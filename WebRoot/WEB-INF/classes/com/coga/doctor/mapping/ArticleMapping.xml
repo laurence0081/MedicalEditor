@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.coga.doctor.dao.IArticleDao" >
+  <resultMap id="ArticleResultMap" type="com.coga.doctor.pojo.Article" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="articlename" property="articlename" jdbcType="VARCHAR" />
+    <result column="articletime" property="articletime" jdbcType="VARCHAR" />
+    <result column="articlewriter" property="articlewriter" jdbcType="VARCHAR" />
+    <result column="articlefrom" property="articlefrom" jdbcType="VARCHAR" />
+    <result column="articlecontent" property="articlecontent" jdbcType="VARCHAR" />
+    <result column="articlegroup" property="articlegroup" jdbcType="INTEGER" />
+    <result column="articletype" property="articletype" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="replynum" property="replynum" jdbcType="INTEGER" />
+    <result column="favnum" property="favnum" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Article_Column_List" >
+    id, articlename, articletime, articlewriter, articlefrom, 
+    articlecontent, articlegroup, articletype, status, replynum, favnum
+  </sql>
+  
+  <insert id="insert" parameterType="com.coga.doctor.pojo.Article" useGeneratedKeys="true" keyProperty="id">  
+  <selectKey resultType="int" keyProperty="id">
+      SELECT LAST_INSERT_ID()
+  </selectKey>
+    insert into article (articlename, articletime, articlewriter, articlefrom, articlecontent, articlegroup, articletype, status, replynum, favnum)
+    values (#{articlename,jdbcType=VARCHAR}, #{articletime,jdbcType=VARCHAR}, #{articlewriter,jdbcType=VARCHAR},
+    #{articlefrom,jdbcType=VARCHAR}, #{articlecontent,jdbcType=VARCHAR}, #{articlegroup,jdbcType=VARCHAR},
+	#{articletype,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{replynum,jdbcType=INTEGER}, #{favnum,jdbcType=INTEGER})
+  </insert>
+  
+  <delete id="deleteByID" parameterType="java.lang.Integer" >
+    delete from article where id = #{id}
+  </delete>
+  
+  <update id="update" parameterType="com.coga.doctor.pojo.Article" >
+    update article
+    set articlename = #{articlename},
+      articlewriter = #{articlewriter},
+      articlefrom = #{articlefrom},
+      articletime = #{articletime},
+      articlecontent = #{articlecontent},
+      articlegroup = #{articlegroup},
+      articletype = #{articletype},
+      status = #{status},
+      replynum = #{replynum},
+      favnum = #{favnum}
+    where id = #{id}
+  </update>
+  
+  <update id="updateStatus" parameterType="com.coga.doctor.pojo.Article" >
+    update article
+    set 
+      status = #{status}
+    where id = #{id}
+  </update>
+  
+  <select id="selectArticleByPage" resultMap="ArticleResultMap" parameterType="com.coga.doctor.pojo.Article" >
+    select 
+    <include refid="Article_Column_List" />
+    from article
+    where articletype = #{articletype} 
+  </select>
+    
+  <select id="selectArticleByName" resultMap="ArticleResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Article_Column_List" />
+    from article
+    where articlename like "%#{articlename}%"
+  </select>
+  
+  <select id="selectArticleById" resultMap="ArticleResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Article_Column_List" />
+    from article
+    where id = #{id}
+  </select>
+  
+  <select id="selectArticleByArticlegroup" resultMap="ArticleResultMap" parameterType="java.lang.Integer" >
+    select 
+    id, articlename, articletime
+    from article
+    where articlegroup = #{articlegroup}
+  </select>
+  
+  <select id="selectArticleByArticletype" resultMap="ArticleResultMap" >
+    select top 5
+    id, articlename, articletime, articlegroup
+    from article
+    where articletype = #{0} and articlegroup = #{1} orderby id desc
+  </select>
+    
+  <select id="selectArticleByChineseByPage" resultMap="ArticleResultMap" parameterType="com.coga.doctor.pojo.Article" >
+    select 
+    <include refid="Article_Column_List" />
+    from article
+    where articletype = #{articletype} ORDER BY CONVERT(articlename USING gbk)
+  </select> 
+</mapper>
